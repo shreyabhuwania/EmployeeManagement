@@ -13,7 +13,7 @@ CREATE TABLE Joinee (
     PAN_No VARCHAR(255) UNIQUE,
     AADHAR_Card_No VARCHAR(12) UNIQUE,
     Highest_Education VARCHAR(50),
-    Year_of_Passing YEAR,
+    Year_of_Passing INT,
     Permanent_Address VARCHAR(255),
     Expertise_or_Skills VARCHAR(255)
 );
@@ -49,7 +49,7 @@ The Employee Management System provides the following functionalities:
 - **Java Development Kit (JDK):** Ensure JDK is installed on your system.
 - **MySQL Server:** Ensure MySQL server is installed and running.
 - **JDBC Driver:** Download and add the MySQL JDBC driver to your project classpath.
-- **Apache POI (optional):** Include Apache POI library for Excel file operations.
+- **Apache POI:** Include Apache POI library for Excel file operations.
 
 ### Setup
 1. **Clone the Repository:**
