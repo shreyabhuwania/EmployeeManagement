@@ -1,53 +1,104 @@
 package employee;
 
+//import java.io.File;
+//import java.io.FileInputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.sql.PreparedStatement;
+//import org.apache.poi.ss.usermodel.*;
+//import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 //implemented this class as a singleton to ensure only one instance exists
 public class JoineeImpl implements JoineeInterf {
 
-	public static final Logger logger = Logger.getLogger(JoineeImpl.class.getName());
-	private final Connection con;
-
-	// creating single instance of class dbconnection
-	public JoineeImpl() {
-		this.con = DBConnection.createDBConnection();
-	}
-
+	public static final Logger logger = Logger.getLogger(JoineeImpl.class.getName());//when is static initialized?
+	private static final Connection connection= DBConnection.createDBConnection();
+	
 	@Override
-	public void createJoinee(Joinee j) {
+	public void createJoinee(Joinee joinee) {
 
 		String query = "insert into joinee values(?,?,?,?,?,?,?,?)";
 		try {
-			PreparedStatement pstm = con.prepareStatement(query);
-			pstm.setInt(1, j.getId());
-			pstm.setString(2, j.getName());
-			pstm.setString(3, j.getPan_no());
-			pstm.setLong(4, j.getAadhar_no());
-			pstm.setString(5, j.getAddress());
-			pstm.setString(6, j.getHighest_education());
-			pstm.setInt(7, j.getPassing_year());
-			pstm.setString(8, j.getSkills());
-			int cnt = pstm.executeUpdate();
+			PreparedStatement updateStatement = connection.prepareStatement(query);
+			updateStatement.setInt(1, joinee.getId());
+			updateStatement.setString(2, joinee.getName());
+			updateStatement.setString(3, joinee.getPanNo());
+			updateStatement.setLong(4, joinee.getAadharNo());
+			updateStatement.setString(5, joinee.getAddress());
+			updateStatement.setString(6, joinee.getHighestEducation());
+			updateStatement.setInt(7, joinee.getPassingYear());
+			updateStatement.setString(8, joinee.getSkills());
+			int cnt = updateStatement.executeUpdate();
 			if (cnt != 0)
 				System.out.println("Employee Inserted succsessfully !!");
 		} catch (Exception ex) {
 			logger.log(Level.SEVERE, "Error inserting joinee", ex);
-			// ex.printStackTrace();
+	
 		}
 	}
 	// Method to convert file to Excel
+
 //	public static void convertFileToExcel(String inputFilePath, String outputExcelFilePath) {
-	
-	// Method to read values from Excel file and add to database
+//	   try {
+//      	   SingletonFileInputStream sfis = SingletonFileInputStream.getInstance(inputFilePath);
+//           SingletonWorkbook sWorkbook = SingletonWorkbook.getInstance(sfis.getFileInputStream());
+//           FileOutputStream fos = new FileOutputStream(outputExcelFilePath);
+//           XSSFWorkbook newWorkbook = new XSSFWorkbook();
+//	            Workbook workbook = sWorkbook.getWorkbook();
+//	            Sheet sheet = newWorkbook.createSheet("Sheet1");
+//	            Sheet inputSheet = workbook.getSheetAt(0);
+//	            for (int i = 0; i <= inputSheet.getLastRowNum(); i++) {
+//	                Row inputRow = inputSheet.getRow(i);
+//	                Row outputRow = sheet.createRow(i);
+//	                for (int j = 0; j < inputRow.getPhysicalNumberOfCells(); j++) {
+//	                    Cell inputCell = inputRow.getCell(j);
+//	                    Cell outputCell = outputRow.createCell(j);
+//	                    outputCell.setCellValue(inputCell.toString());
+//	                }
+//	            }
+//	            newWorkbook.write(fos);
+//	            System.out.println("File converted to Excel format.");
+//	        } catch (Exception ex) {
+//	            logger.log(Level.SEVERE, "Error converting file to Excel", ex);
+//	        }
+//	
+//	    }
+//	// Method to read values from Excel file and add to database
+//
 //	public static void readExcelFile(String excelFilePath, JoineeImpl obj) {
+//		FileInputStream file = null;
+//		Workbook workbook = null;
+//	    try  {
+//	    	 file = new FileInputStream(new File(excelFilePath));
+//	         workbook = new XSSFWorkbook(file);
+//	        Sheet sheet = workbook.getSheetAt(0);
+//	        for (Row row : sheet) {
+//	            if (row.getRowNum() == 0) {
+//	                continue; // Skip header row
+//	            }
+//	            Joinee joinee = new Joinee();
+//	            j.setId((int) row.getCell(0).getNumericCellValue());
+//	            j.setName(row.getCell(1).getStringCellValue());
+//	            j.setPan_no(row.getCell(2).getStringCellValue());
+//	            j.setAadharNo((long) row.getCell(3).getNumericCellValue());
+//	            j.setAddress(row.getCell(4).getStringCellValue());
+//	            j.setHighestEducation(row.getCell(5).getStringCellValue());
+//	            j.setPassingYear((int) row.getCell(6).getNumericCellValue());
+//	            j.setSkills(row.getCell(7).getStringCellValue());
+//	            obj.createJoinee(j);
+//	        }
+//	        System.out.println("Excel data imported successfully!");
+//	    } catch (Exception ex) {
+//	        logger.log(Level.SEVERE, "Error reading Excel file", ex);
+//	    }
+//	}
+	
+
 	@Override
 	public void showAllJoinee() {
-//		con = DBConnection.createDBConnection();
 		String query = "select * from joinee";
 		System.out.println("Joinee Details :");
 		System.out
@@ -57,71 +108,74 @@ public class JoineeImpl implements JoineeInterf {
 		System.out
 				.println("-------------------------------------------------------------------------------------------");
 		try {
-			Statement stmt = con.createStatement();
-			ResultSet result = stmt.executeQuery(query);
-			while (result.next()) {// use alternative for while
-				System.out.format("%d\t%s\t%s\t%d\t%s\t%s\t%d\t%s\n", result.getInt(1), result.getString(2),
-						result.getString(3), result.getLong(4), result.getString(5), result.getString(6),
-						result.getInt(7), result.getString(8));
+			Statement queryStatement = connection.createStatement();
+			ResultSet queryResult = queryStatement.executeQuery(query);
+			while (queryResult.next()) {
+				System.out.format("%d\t%s\t%s\t%d\t%s\t%s\t%d\t%s\n", queryResult.getInt(1), queryResult.getString(2),
+						queryResult.getString(3), queryResult.getLong(4), queryResult.getString(5), queryResult.getString(6),
+						queryResult.getInt(7), queryResult.getString(8));
 				System.out.println(
 						"------------------------------------------------------------------------------------");
 			}
 		} catch (Exception ex) {
 			logger.log(Level.SEVERE, "Error retrieving joinee details", ex);
-			// ex.printStackTrace();
+
 		}
 	}
 
 	@Override
 	public void showJoineeBasedOnID(int id) {
-//		con = DBConnection.createDBConnection();
 		String query = "select * from joinee where id=" + id;
 		try {
-			Statement stmt = con.createStatement();
-			ResultSet result = stmt.executeQuery(query);// use alternative
-			while (result.next()) {
-				System.out.format("%d\t%s\t%s\t%d\t%s\t%s\t%d\t%s\n", result.getInt(1), result.getString(2),
-						result.getString(3), result.getLong(4), result.getString(5), result.getString(6),
-						result.getInt(7), result.getString(8));
+			Statement queryStatement = connection.createStatement();
+			ResultSet queryResult = queryStatement.executeQuery(query);
+			while (queryResult.next()) {
+				System.out.format("%d\t%s\t%s\t%d\t%s\t%s\t%d\t%s\n", queryResult.getInt(1), queryResult.getString(2),
+						queryResult.getString(3), queryResult.getLong(4), queryResult.getString(5), queryResult.getString(6),
+						queryResult.getInt(7), queryResult.getString(8));
 			}
 		} catch (Exception ex) {
 			logger.log(Level.SEVERE, "Error retrieving joinee based on ID", ex);
-			// ex.printStackTrace();
+	
 		}
 	}
 
 	@Override
-	public void updateJoinee(int id, String name) {
-//		con = DBConnection.createDBConnection();
-		String query = "update joinee set name=? where id=?";
+	public void updateJoinee(Joinee joinee,int id, String name, String panNo, long aadharNo, String address, String highestEducation, int passingYear, String skills) {
+		String query = "UPDATE joinee SET name=?, pan_no=?, aadhar_no=?, address=?, highest_education=?, passing_year=?, skills=? where id=?";
 		try {
-			PreparedStatement pstm = con.prepareStatement(query);
-			pstm.setInt(1, id);
-			pstm.setString(2, name);
-			int cnt = pstm.executeUpdate();// check if not using executeupdate
-			if (cnt != 0)
+			PreparedStatement updateStatement = connection.prepareStatement(query);
+			updateStatement.setString(1, name);
+			updateStatement.setString(2, panNo);
+			updateStatement.setLong(3, aadharNo);
+			updateStatement.setString(4, address);
+			updateStatement.setString(5, highestEducation);
+			updateStatement.setInt(6, passingYear);
+			updateStatement.setString(7, skills);
+			updateStatement.setInt(8, id);
+
+			if (updateStatement.executeUpdate()!= 0)
 				System.out.println("Employee Details updated successfully !!");
 
 		} catch (Exception ex) {
 			logger.log(Level.SEVERE, "Error updating joinee details", ex);
-			// ex.printStackTrace();
+	
 		}
 	}
 
 	@Override
 	public void deleteJoinee(int id) {
-//		con = DBConnection.createDBConnection();
 		String query = "delete from joinee where id=?";
 		try {
-			PreparedStatement pstm = con.prepareStatement(query);
-			pstm.setInt(1, id);
-			int cnt = pstm.executeUpdate();
+			PreparedStatement queryStatement = connection.prepareStatement(query);
+			queryStatement.setInt(1, id);
+			int cnt = queryStatement.executeUpdate();
 			if (cnt != 0)
 				System.out.println("Employee Deleted Successfully!!! " + id);
 
 		} catch (Exception ex) {
 			logger.log(Level.SEVERE, "Error deleting joinee", ex);
-			// ex.printStackTrace();
+
 		}
 	}
 
