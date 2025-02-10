@@ -11,7 +11,7 @@ public class Main {
 		Long aadharNo;
 		int passingYear;
 		
-		JoineeImpl crudOperations = new JoineeImpl();
+		JoineeInterf crudOperations = new JoineeImpl();
 		System.out.println("Welcome to Employee management application");
 		try (Scanner scanner = new Scanner(System.in)) {
 			do {

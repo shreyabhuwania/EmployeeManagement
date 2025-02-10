@@ -3,7 +3,7 @@ package employee;
 import java.sql.*;//gives java database connectivity api
 
 public final class DBConnection {
-	static Connection connection;
+	private static Connection connection;
 	
 	private DBConnection() {
 
